@@ -133,7 +133,7 @@ public:
     void balanceEnquiry() const;
     void deposit() const;
     void withdrawal() const;
-
+    void closeAccount();
     void showAllAcounts();
     void readAccounts();
     void saveAcounts();
@@ -228,6 +228,21 @@ void Bank::withdrawal() const {
     }
 }
 
+void Bank::closeAccount() {
+    int accountNumber = 0;
+    cout << "Enter the Number of the Account: ";
+    cin >> accountNumber;
+
+    auto index = findAccount(accountNumber);
+    // Account Not Found
+    if (index == -1)
+        return;
+
+    // Found
+    list.erase(list.begin() + index);
+    cout << "The Account was Successfully Closed!" << endl;
+}
+
 void Bank::showAllAcounts() {
     if (list.size() == 0) 
         cout << "The list of accounts is empty." << endl;
@@ -312,6 +327,7 @@ int main()
                 break;
 
             case 5: // Close an Account
+                bank.closeAccount();
                 break;
 
             case 6: // Show All 
