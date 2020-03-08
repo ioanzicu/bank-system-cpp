@@ -42,6 +42,8 @@ public:
 
     string getFullName() { return firstName + " " + lastName; }
 
+    void deposit(float deposit);
+
     // Serialize - Override << operator to write the object's state into a file
     friend ofstream& operator <<(ofstream& ofs, Account& a);
     // Deserialize - Override >> operator to read the opbject's stat from the file
@@ -51,6 +53,15 @@ public:
 };
 
 int Account::count = 0;
+
+void Account::deposit(float deposit) {
+    if (deposit < 0) {
+        cout << "The deposit cannot be less than 0." << endl;
+        return;
+    }
+
+    balance += deposit;
+}
 
 // Serialize - write 
 ofstream& operator <<(ofstream& ofs, Account& a)
@@ -103,14 +114,31 @@ public:
         }
         list.clear();
     }
+    
+    int findAccount(size_t n) const;
 
     void openAccount();
-    void balanceEnquiry(size_t n) const;
+    void balanceEnquiry() const;
+    void deposit() const;
+
     void showAllAcounts();
     void readAccounts();
     void saveAcounts();
     void displayMenu() const;
 };
+
+int Bank::findAccount(size_t n) const {
+    auto itr = find_if(list.begin(), list.end(), [&n](Account* const& obj) {return  obj->getNumber() == n; });
+
+    if (itr != list.end()) {
+        // Element found - an iterator to the first matching element.
+        return distance(list.begin(), itr); // return index
+    }
+    else {
+        cout << "There is no Acount with such number!" << endl;
+        return -1;
+    }
+}
 
 void Bank::openAccount() {
     string name, surname;
@@ -129,20 +157,44 @@ void Bank::openAccount() {
     cout << "Congratulations, New Acount was Successfull Created!!!" << endl;
 }
 
-void Bank::balanceEnquiry(size_t n) const {
+void Bank::balanceEnquiry() const {
+    int accountNumber = 0;
+    cout << "Enter the Number of the Account: ";
+    cin >> accountNumber;
 
-    auto itr = find_if(list.begin(), list.end(), [&n](Account *const& obj) {return  obj->getNumber() == n; });
+    auto index = findAccount(accountNumber);
+    // Account Not Found
+    if (index == -1) {
+        return;
+    }
 
-    if (itr != list.end()) {
-        // Element found - an iterator to the first matching element.
-        auto index = distance(list.begin(), itr);
-
-        cout << endl << "The Balance of the User:"
-            << list[index]->getFullName() << " is: "
-            << list[index]->getBalance() << "$" << endl;
-    } else
-        cout << "There is no Acount with such number!" << endl;
+    cout << endl << "The Balance of the User:"
+        << list[index]->getFullName() << " is: "
+        << list[index]->getBalance() << "$" << endl;
 }
+
+void Bank::deposit() const {
+    int accountNumber = 0;
+    cout << "Enter the Number of the Account: ";
+    cin >> accountNumber;
+
+    auto index = findAccount(accountNumber);
+    // Account Not Found
+    if (index == -1) {
+        return;
+    }
+
+    // Found
+    float deposit = 0.0f;
+    cout << "Enter the amount of the deposit: ";
+    cin >> deposit;
+
+    list[index]->deposit(deposit);
+    cout << "The balance of the " << list[index]->getFullName()
+        << " was increased by: +" << deposit << "$" << endl
+        << "Current balance is: " << list[index]->getBalance() << "$" << endl;
+}
+
 
 void Bank::showAllAcounts() {
     if (list.size() == 0) 
@@ -219,15 +271,11 @@ int main()
                 break;
 
             case 2: // Balance Enquiry 
-                {
-                    int accountNumber = 0;
-                    cout << "Enter the Number of the Account: ";
-                    cin >> accountNumber;
-                    bank.balanceEnquiry(accountNumber);
-                }
+                bank.balanceEnquiry();
                 break;
 
             case 3: // Deposit
+                bank.deposit();
                 break;
 
             case 4: // Withdrawal

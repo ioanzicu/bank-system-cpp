@@ -11,15 +11,15 @@ Griffin
 Hommer
 Simpson
 4
-12.2
+13
 
 Marge
 Simpson
 5
-23.2
+23.21
 
 Maggy
 Simp
 6
-2.3
+20
 
