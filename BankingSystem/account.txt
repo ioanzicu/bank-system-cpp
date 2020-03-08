@@ -1,7 +1,7 @@
 Ioan
 Zicu
 1
-100
+100.01
 
 Peter
 Griffin
@@ -13,8 +13,13 @@ Simpson
 4
 13
 
-Maggy
-Simp
+Optimus
+Prime
 6
-20
+3.33333e+07
+
+Artur
+Martor
+7
+40000
 

@@ -127,7 +127,7 @@ public:
         list.clear();
     }
     
-    int findAccount(size_t n) const;
+    int findAccount() const;
 
     void openAccount();
     void balanceEnquiry() const;
@@ -140,8 +140,12 @@ public:
     void displayMenu() const;
 };
 
-int Bank::findAccount(size_t n) const {
-    auto itr = find_if(list.begin(), list.end(), [&n](Account* const& obj) {return  obj->getNumber() == n; });
+int Bank::findAccount() const {
+    int accNumber = 0;
+    cout << "Enter the Number of the Account: ";
+    cin >> accNumber;
+
+    auto itr = find_if(list.begin(), list.end(), [&accNumber](Account* const& obj) {return  obj->getNumber() == accNumber; });
 
     if (itr != list.end()) {
         // Element found - an iterator to the first matching element.
@@ -170,11 +174,8 @@ void Bank::openAccount() {
 }
 
 void Bank::balanceEnquiry() const {
-    int accountNumber = 0;
-    cout << "Enter the Number of the Account: ";
-    cin >> accountNumber;
 
-    auto index = findAccount(accountNumber);
+    auto index = findAccount();
     // Account Not Found
     if (index == -1)
         return;
@@ -185,11 +186,8 @@ void Bank::balanceEnquiry() const {
 }
 
 void Bank::deposit() const {
-    int accountNumber = 0;
-    cout << "Enter the Number of the Account: ";
-    cin >> accountNumber;
-
-    auto index = findAccount(accountNumber);
+   
+    auto index = findAccount();
     // Account Not Found
     if (index == -1)
         return;
@@ -207,11 +205,8 @@ void Bank::deposit() const {
 }
 
 void Bank::withdrawal() const {
-    int accountNumber = 0;
-    cout << "Enter the Number of the Account: ";
-    cin >> accountNumber;
 
-    auto index = findAccount(accountNumber);
+    auto index = findAccount();
     // Account Not Found
     if (index == -1)
         return;
@@ -229,11 +224,8 @@ void Bank::withdrawal() const {
 }
 
 void Bank::closeAccount() {
-    int accountNumber = 0;
-    cout << "Enter the Number of the Account: ";
-    cin >> accountNumber;
 
-    auto index = findAccount(accountNumber);
+    auto index = findAccount();
     // Account Not Found
     if (index == -1)
         return;
