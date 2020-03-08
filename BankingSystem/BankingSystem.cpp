@@ -5,9 +5,9 @@
 #include <vector>
 #include <string>
 #include <fstream>
+#include <iomanip>
 
 using namespace std;
-
 
 /* Account Class */
 
@@ -42,7 +42,8 @@ public:
 
     string getFullName() { return firstName + " " + lastName; }
 
-    void deposit(float deposit);
+    bool deposit(float amount);
+    bool withdrawal(float amount);
 
     // Serialize - Override << operator to write the object's state into a file
     friend ofstream& operator <<(ofstream& ofs, Account& a);
@@ -54,13 +55,24 @@ public:
 
 int Account::count = 0;
 
-void Account::deposit(float deposit) {
-    if (deposit < 0) {
+bool Account::deposit(float amount) {
+    if (amount < 0) {
         cout << "The deposit cannot be less than 0." << endl;
-        return;
+        return false;
+    } else {
+        balance += amount;
+        return true;
     }
+}
 
-    balance += deposit;
+bool Account::withdrawal(float amount) {
+    if (amount > balance) {
+        cout << "The amount of the Withdrawal should be less than Balance." << endl;
+        return false;
+    } else {
+        balance -= amount;
+        return true;
+    }
 }
 
 // Serialize - write 
@@ -88,7 +100,7 @@ ostream& operator <<(ostream& out, const Account& a)
     cout << "First Name: " << a.firstName << endl;
     cout << "Last Name: " << a.lastName << endl;
     cout << "Account: " << a.number << endl;
-    cout << "Balance: " << a.balance << endl;
+    cout << "Balance: " << a.balance << "$" << endl;
     return out;
 }
 
@@ -109,9 +121,9 @@ public:
         saveAcounts();
 
         // Release Memory
-        for (auto account : list) {
+        for (auto account : list) 
             delete account;
-        }
+        
         list.clear();
     }
     
@@ -120,6 +132,7 @@ public:
     void openAccount();
     void balanceEnquiry() const;
     void deposit() const;
+    void withdrawal() const;
 
     void showAllAcounts();
     void readAccounts();
@@ -133,8 +146,7 @@ int Bank::findAccount(size_t n) const {
     if (itr != list.end()) {
         // Element found - an iterator to the first matching element.
         return distance(list.begin(), itr); // return index
-    }
-    else {
+    } else {
         cout << "There is no Acount with such number!" << endl;
         return -1;
     }
@@ -164,9 +176,8 @@ void Bank::balanceEnquiry() const {
 
     auto index = findAccount(accountNumber);
     // Account Not Found
-    if (index == -1) {
+    if (index == -1)
         return;
-    }
 
     cout << endl << "The Balance of the User:"
         << list[index]->getFullName() << " is: "
@@ -180,21 +191,42 @@ void Bank::deposit() const {
 
     auto index = findAccount(accountNumber);
     // Account Not Found
-    if (index == -1) {
+    if (index == -1)
         return;
-    }
 
     // Found
-    float deposit = 0.0f;
-    cout << "Enter the amount of the deposit: ";
-    cin >> deposit;
+    float amount = 0.0f;
+    cout << "Enter the amount of the Deposit: ";
+    cin >> amount;
 
-    list[index]->deposit(deposit);
-    cout << "The balance of the " << list[index]->getFullName()
-        << " was increased by: +" << deposit << "$" << endl
-        << "Current balance is: " << list[index]->getBalance() << "$" << endl;
+    if (list[index]->deposit(amount)) {
+        cout << "The balance of the " << list[index]->getFullName()
+            << " was increased by: +" << amount << "$" << endl
+            << "Current balance is: " << list[index]->getBalance() << "$" << endl;
+    }
 }
 
+void Bank::withdrawal() const {
+    int accountNumber = 0;
+    cout << "Enter the Number of the Account: ";
+    cin >> accountNumber;
+
+    auto index = findAccount(accountNumber);
+    // Account Not Found
+    if (index == -1)
+        return;
+
+    // Found
+    float amount = 0.0f;
+    cout << "Enter the amount of the Withdrawal: ";
+    cin >> amount;
+
+    if (list[index]->withdrawal(amount)) {
+        cout << "The balance of the " << list[index]->getFullName()
+            << " was decreased by: -" << amount << "$" << endl
+            << "Current balance is: " << list[index]->getBalance() << "$" << endl;
+    }
+}
 
 void Bank::showAllAcounts() {
     if (list.size() == 0) 
@@ -210,7 +242,6 @@ void Bank::readAccounts() {
     Account* temp;
 
     if (ifs.is_open())
-    {
         while (!ifs.eof()) 
         {
             // Create new pointer to the Account object in the Heap
@@ -224,11 +255,9 @@ void Bank::readAccounts() {
                 list.push_back(temp);
             }
         }
-    }
 
     ifs.close();
 }
-
 
 void Bank::saveAcounts() 
 {
@@ -261,7 +290,7 @@ int main()
     {
         bank.displayMenu();
 
-        cout << "\nEnter your choice: ";
+        cout << fixed << setprecision(2) << "\nEnter your choice: ";
         cin >> choice;
 
         switch (choice)
@@ -279,6 +308,7 @@ int main()
                 break;
 
             case 4: // Withdrawal
+                bank.withdrawal();
                 break;
 
             case 5: // Close an Account
