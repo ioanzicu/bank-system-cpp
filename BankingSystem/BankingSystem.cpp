@@ -7,22 +7,24 @@
 #include <fstream>
 #include <iomanip>
 
+#define MIN_BALANCE 100
+
 using namespace std;
 
 /* Account Class */
 
 class Account {
 private:
-    static int count;
-    size_t number;
+    static int NextAccountNumber;
+    long number;
     string firstName;
     string lastName;
     float balance;
 public:
     Account(string firstName="Unknown", string lastName="Unknown", float balance=0.0f)
     {
-        count++;
-        number = count;
+        NextAccountNumber++;
+        number = NextAccountNumber;
         this->firstName = firstName;
         this->lastName = lastName;
         this->balance = balance;
@@ -35,15 +37,15 @@ public:
     void setLastName(string s) { lastName = s; }
     string getLastName() const { return lastName; }
     
-    size_t getNumber() const { return number; }
+    long getNumber() const { return number; }
 
     void setBalance(float b) { balance = b; }
     float getBalance() const { return balance; }
 
     string getFullName() { return firstName + " " + lastName; }
 
-    bool deposit(float amount);
-    bool withdrawal(float amount);
+    bool Deposit(float amount);
+    bool Withdrawal(float amount);
 
     // Serialize - Override << operator to write the object's state into a file
     friend ofstream& operator <<(ofstream& ofs, Account& a);
@@ -53,9 +55,9 @@ public:
     friend ostream& operator <<(ostream& out, const Account& a);
 };
 
-int Account::count = 0;
+int Account::NextAccountNumber = 0;
 
-bool Account::deposit(float amount) {
+bool Account::Deposit(float amount) {
     if (amount < 0) {
         cout << "The deposit cannot be less than 0." << endl;
         return false;
@@ -65,14 +67,14 @@ bool Account::deposit(float amount) {
     }
 }
 
-bool Account::withdrawal(float amount) {
-    if (amount > balance) {
+bool Account::Withdrawal(float amount) {
+    if (balance - amount < MIN_BALANCE) {
         cout << "The amount of the Withdrawal should be less than Balance." << endl;
         return false;
-    } else {
-        balance -= amount;
-        return true;
-    }
+    } 
+
+    balance -= amount;
+    return true;
 }
 
 // Serialize - write 
@@ -197,7 +199,7 @@ void Bank::deposit() const {
     cout << "Enter the amount of the Deposit: ";
     cin >> amount;
 
-    if (list[index]->deposit(amount)) {
+    if (list[index]->Deposit(amount)) {
         cout << "The balance of the " << list[index]->getFullName()
             << " was increased by: +" << amount << "$" << endl
             << "Current balance is: " << list[index]->getBalance() << "$" << endl;
@@ -216,7 +218,7 @@ void Bank::withdrawal() const {
     cout << "Enter the amount of the Withdrawal: ";
     cin >> amount;
 
-    if (list[index]->withdrawal(amount)) {
+    if (list[index]->Withdrawal(amount)) {
         cout << "The balance of the " << list[index]->getFullName()
             << " was decreased by: -" << amount << "$" << endl
             << "Current balance is: " << list[index]->getBalance() << "$" << endl;
@@ -332,6 +334,7 @@ int main()
 
             default:
                 cout << "Unknown option: " << choice << endl;
+                exit(0);
                 break;
         }
     }

@@ -11,12 +11,12 @@ Griffin
 Hommer
 Simpson
 4
-13
+3013
 
 Optimus
 Prime
 6
-3.33333e+07
+33296
 
 Artur
 Martor
