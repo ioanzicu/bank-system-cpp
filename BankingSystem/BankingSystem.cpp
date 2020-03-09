@@ -33,16 +33,12 @@ public:
         this->balance = balance;
     }
     
-    // Accessors and Mutators
-    void setFirstName(string n) { firstName = n; }
+    // Accessors
     string getFirstName() const { return firstName; }
-
-    void setLastName(string s) { lastName = s; }
     string getLastName() const { return lastName; }
     
     long getAccNumber() const { return number; }
-
-    static void setNextAccountNumber(long n) { NextAccountNumber = n; }
+    static void setLastAccountNumber(long n) { NextAccountNumber = n; }
 
     void setBalance(float b) { balance = b; }
     float getBalance() const { return balance; }
@@ -116,7 +112,7 @@ ostream& operator <<(ostream& out, const Account& a)
 
 class Bank {
 private:
-   map<long, Account> list;
+   map<long, Account> accounts;
    const string FILE_NAME = "account.txt";
 public:
     Bank()
@@ -130,12 +126,13 @@ public:
     
     Account findAccount() const throw(UnknownAccount);
 
-    void openAccount();
-    void balanceEnquiry() const;
-    void deposit() const;
-    void withdrawal() const;
-    void closeAccount();
-    void showAllAcounts();
+    void OpenAccount();
+    void BalanceEnquiry() const;
+    void Deposit() const;
+    void Withdrawal() const;
+    void CloseAccount();
+    void ShowAllAcounts();
+
     void readAccounts();
     void saveAcounts();
     void displayMenu() const;
@@ -143,24 +140,24 @@ public:
 
 Account Bank::findAccount() const throw(UnknownAccount) {
     long accNumber = 0;
-    auto itr = list.find(accNumber);
+    auto itr = accounts.find(accNumber);
     
     do {
         cout << "Enter the Number of the Account: ";
         cin >> accNumber;
 
-        itr = list.find(accNumber);
-        if (itr == list.end()) {
+        itr = accounts.find(accNumber);
+        if (itr == accounts.end()) {
             cout << "There is no Account with Number: " << accNumber << endl
                  << "Please try again!" << endl;
         }
 
-    } while (itr == list.end());
+    } while (itr == accounts.end());
 
     return itr->second;
 }
 
-void Bank::openAccount() {
+void Bank::OpenAccount() {
     string name, surname;
     float b = 0.0f;
 
@@ -174,13 +171,13 @@ void Bank::openAccount() {
     Account newAcc(name, surname, b);
 
     // Add new account to the list
-    list.insert(pair<long, Account>(newAcc.getAccNumber(), newAcc));
+    accounts.insert(pair<long, Account>(newAcc.getAccNumber(), newAcc));
 
     cout << "Congratulations, New Acount was Successfull Created!!!" << endl;
     cout << newAcc << endl << endl;
 }
 
-void Bank::balanceEnquiry() const {
+void Bank::BalanceEnquiry() const {
 
     auto acc = findAccount();
     
@@ -189,7 +186,7 @@ void Bank::balanceEnquiry() const {
         << acc.getBalance() << "$" << endl;
 }
 
-void Bank::deposit() const {
+void Bank::Deposit() const {
    
     auto acc = findAccount();
  
@@ -205,7 +202,7 @@ void Bank::deposit() const {
     }
 }
 
-void Bank::withdrawal() const {
+void Bank::Withdrawal() const {
 
     auto acc = findAccount();
    
@@ -221,28 +218,28 @@ void Bank::withdrawal() const {
     }
 }
 
-void Bank::closeAccount() {
+void Bank::CloseAccount() {
 
     long accNumber = 0;
     cout << "Enter the Number of the Account: ";
     cin >> accNumber;
 
-    auto itr = list.find(accNumber);
+    auto itr = accounts.find(accNumber);
 
-    if (itr == list.end()) {
+    if (itr == accounts.end()) {
         cout << "There is no Acount with such number!" << endl;
         return;
     }
    
-    list.erase(accNumber);
+    accounts.erase(accNumber);
     cout << "The Account Number: " << accNumber << " was Successfully Closed!" << endl;
 }
 
-void Bank::showAllAcounts() {
-    if (list.size() == 0) 
+void Bank::ShowAllAcounts() {
+    if (accounts.size() == 0) 
         cout << "The list of accounts is empty." << endl;
     else {
-        for (auto account : list)
+        for (auto account : accounts)
             cout << account.second << endl;
     }
 }
@@ -259,19 +256,19 @@ void Bank::readAccounts() {
 
             if (!ifs.eof()) {
                 // Add the Account to the list
-                list.insert(pair<long, Account>(temp.getAccNumber(), temp));
+                accounts.insert(pair<long, Account>(temp.getAccNumber(), temp));
             }
         }
 
     // Set the Account Number to the last inserted 
-    auto lastAccountNumber = list.end();
+    auto lastAccountNumber = accounts.end();
     long n;
-    if (list.begin() != lastAccountNumber) {
+    if (accounts.begin() != lastAccountNumber) {
         --lastAccountNumber;
         n = lastAccountNumber->first;
     }
     
-    Account::setNextAccountNumber(n);
+    Account::setLastAccountNumber(n);
 
     ifs.close();
 }
@@ -280,7 +277,7 @@ void Bank::saveAcounts()
 {
     ofstream ofs(FILE_NAME);
 
-    for (auto account : list)
+    for (auto account : accounts)
         ofs << account.second << endl;
  
     ofs.close();
@@ -313,27 +310,27 @@ int main()
         switch (choice)
         {
             case 1: // Open an Account
-                bank.openAccount();
+                bank.OpenAccount();
                 break;
 
             case 2: // Balance Enquiry 
-                bank.balanceEnquiry();
+                bank.BalanceEnquiry();
                 break;
 
             case 3: // Deposit
-                bank.deposit();
+                bank.Deposit();
                 break;
 
             case 4: // Withdrawal
-                bank.withdrawal();
+                bank.Withdrawal();
                 break;
 
             case 5: // Close an Account
-                bank.closeAccount();
+                bank.CloseAccount();
                 break;
 
             case 6: // Show All 
-                bank.showAllAcounts();
+                bank.ShowAllAcounts();
                 break;
 
             case 7: // Quit
